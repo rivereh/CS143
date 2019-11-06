@@ -8,14 +8,20 @@ public class SudokuSolverEngine {
       System.out.println("Initial board");
       System.out.println(board);
       System.out.println();
-   
-      System.out.print("Solving board...");
-      long start = System.currentTimeMillis();
-      board.solve();
-      long stop = System.currentTimeMillis();
-      System.out.printf("SOLVED in %.3f seconds.\n", ((stop-start)/1000.0));
-      System.out.println();
-      System.out.println(board);
+      
+      if (board.isSolved())
+         System.out.println("Board is already solved");
+      else if (!board.isValid())
+         System.out.println("Board is invalid");
+      else {
+         System.out.print("Solving board...");
+         long start = System.currentTimeMillis();
+         board.solve();
+         long stop = System.currentTimeMillis();
+         System.out.printf("SOLVED in %.3f seconds.\n", ((stop-start)/1000.0));
+         System.out.println();
+         System.out.println(board);
+      }
       
    }
 }
