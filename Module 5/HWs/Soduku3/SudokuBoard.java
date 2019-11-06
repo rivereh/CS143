@@ -1,21 +1,28 @@
 // River Hill
 // CS 143
-// HW #1: Sudoku #2
+// HW #3: Sudoku #3
 //
-// This object class will allow us to create a Sudoku board
+// This class allows us to create a Sudoku board
 // which reads in a file to populate it's numerical fields, it
 // also allows us to neatly print a representation of the board
 // to the console.
-// Newest Addition: Validating and checking to see if boards are solved
+// Addition 1: Validating and checking to see if boards are solved
+// Addition 2: Ability to solve board using recursive backtracking
+// NOTE: In order to see GUI, uncomment the three boardGUI lines and
+// also make sure BoardGUI update method accepts int[][] instead
+// of char[][] :)
 
 import java.util.*;
 import java.io.*;
 
 public class SudokuBoard {
-   
-   private int[][] board = new int[9][9];
+   public final int SIZE = 9;
+   protected int[][] board;
+   //protected BoardGUI boardGUI;
    
    public SudokuBoard(String fileName) {
+      board = new int[SIZE][SIZE];
+      //boardGUI = new BoardGUI(SIZE);
       try {
          Scanner file = new Scanner(new File(fileName));
          int row = 0;
@@ -31,25 +38,44 @@ public class SudokuBoard {
       }
    }
    
-   public String toString() {
-      String result = "";
-      for (int r = 0; r < board.length; r++) {
-         if (r % 3 == 0 && r != 0)
-            result += "--- + --- + ---\n";
-         for (int c = 0; c < board[0].length; c++) {
-            if (c % 3 == 0 && c != 0)
-               result += " | ";
-            result += board[r][c] == 0 ? "*" : board[r][c];
-         }
-         result += "\n";
-      }
-      return result;
+   public boolean solve() {
+      if (!isValid())
+         return false;
+      else if (isSolved())
+         return true;
+      
+      for (int r = 0; r < board.length; r++)
+         for (int c = 0; c < board[0].length; c++)
+            if (board[r][c] == 0)
+               for (int i = 1; i <= 9; i++) {
+                  board[r][c] = i;
+                  //boardGUI.update(board);
+                  if (solve())
+                     return true;
+                  board[r][c] = 0;
+               }
+      return false;
+   }
+   
+   // modified from Crystal's HW #3 starter files
+   public boolean isSolved() {
+      if (!isValid())
+         return false;
+      Map<Integer, Integer> map = new HashMap<>();
+      for (int[] row : board)
+         for (int num : row)
+            if (map.containsKey(num))
+               map.put(num, map.get(num) + 1);
+            else
+               map.put(num, 1);
+      // info on Collections: https://docs.oracle.com/javase/8/docs/api/?java/util/Collections.html
+      return map.keySet().size() == 9 && Collections.frequency(map.values(),9) == 9;
    }
    
    public boolean isValid() {
       return checkValidData() && checkRows() && checkCols() && checkMiniSquares();
    }
-   
+      
    private boolean checkValidData() {
       Set<Integer> validData = new HashSet<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
       Set<Integer> boardData = new HashSet<>();
@@ -60,9 +86,6 @@ public class SudokuBoard {
       return boardData.size() == 0;
    }
    
-   // creates a row HashSet and iterates through each row.
-   // if current element is in the HashSet return false,
-   // otherwise add it to the HashSet
    private boolean checkRows() {  
       for (int[] row : board) {
          Set<Integer> setRow = new HashSet<>();
@@ -124,33 +147,51 @@ public class SudokuBoard {
       return mini;
    }
    
-   // modified from Crystal's HW #3 starter files
-   public boolean isSolved() {
-      if (!isValid())
-         return false;
-      Map<Integer, Integer> map = new HashMap<>();
-      for (int[] row : board)
-         for (int num : row)
-            if (map.containsKey(num))
-               map.put(num, map.get(num) + 1);
-            else
-               map.put(num, 1);
-      // info on Collections: https://docs.oracle.com/javase/8/docs/api/?java/util/Collections.html
-      return map.keySet().size() == 9 && Collections.frequency(map.values(),9) == 9;
+   public String toString() {
+      String result = "";
+      for (int r = 0; r < board.length; r++) {
+         if (r % 3 == 0 && r != 0)
+            result += "--- + --- + ---\n";
+         for (int c = 0; c < board[0].length; c++) {
+            if (c % 3 == 0 && c != 0)
+               result += " | ";
+            result += board[r][c] == 0 ? "*" : board[r][c];
+         }
+         result += "\n";
+      }
+      return result;
    }
 }
 
-/* Exptected output from SudokuCheckerEngineV2
-  ----jGRASP exec: java -ea SudokuCheckerEngineV2
- Checking empty board...passed.
- Checking incomplete, valid board...passed.
- Checking complete, valid board...passed.
- Checking dirty data board...passed.
- Checking row violating board...passed.
- Checking col violating board...passed.
- Checking row&col violating board...passed.
- Checking mini-square violating board...passed.
- **** HORRAY: ALL TESTS PASSED ****
+/* Exptected output from SudokuSolverEngine
+  ----jGRASP exec: java -ea SudokuSolverEngine
+ Initial board
+ *34 | 678 | 912
+ *72 | 195 | 348
+ 198 | 342 | 567
+ --- + --- + ---
+ **9 | *61 | 423
+ *26 | 853 | 791
+ *13 | 924 | *56
+ --- + --- + ---
+ *61 | 537 | 284
+ *8* | 419 | 635
+ 345 | *86 | 179
+ 
+ 
+ Solving board...SOLVED in 1.353 seconds.
+ 
+ 534 | 678 | 912
+ 672 | 195 | 348
+ 198 | 342 | 567
+ --- + --- + ---
+ 859 | 761 | 423
+ 426 | 853 | 791
+ 713 | 924 | 856
+ --- + --- + ---
+ 961 | 537 | 284
+ 287 | 419 | 635
+ 345 | 286 | 179
  
   ----jGRASP: operation complete.
 */

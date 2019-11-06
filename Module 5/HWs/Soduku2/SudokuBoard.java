@@ -1,6 +1,6 @@
 // River Hill
 // CS 143
-// HW #1: Sudoku #2
+// HW #2: Sudoku #2
 //
 // This object class will allow us to create a Sudoku board
 // which reads in a file to populate it's numerical fields, it
