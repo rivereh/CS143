@@ -13,7 +13,7 @@ public class ListNode<E> {
     }
 
     // post: constructs a node with given data and given link
-    public ListNode(E data, ListNode next) {
+    public ListNode(E data, ListNode<E> next) {
         this.data = data;
         this.next = next;
     }

@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class LinkedListTester {
    public static void main(String[] args) {
       Scanner console = new Scanner(System.in);
-      LinkedIntList llist = new LinkedIntList();
+      LinkedIntList llist = new LinkedIntList(29);
       System.out.println(llist + " size=" + llist.size());
       
       String option = "";
@@ -21,6 +21,9 @@ public class LinkedListTester {
          } else if(option.startsWith("re")) {
             int removed = llist.removeEnd();
             System.out.println("Removed " + removed);
+         } else if(option.startsWith("c")) {
+            System.out.print("Contains what? > ");
+            System.out.println(llist.contains(console.nextInt()));
          }
          System.out.println(llist + " size=" + llist.size());
       } while(!option.startsWith("d"));

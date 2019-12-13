@@ -14,9 +14,28 @@ public class HTMLManager {
       tags = new LinkedList<>();
       if (passedTags == null)
          throw new IllegalArgumentException();
-      else
-         while (!passedTags.isEmpty())
-            tags.add(passedTags.remove());
+      else {
+         int size = passedTags.size();
+         for (int i = 0; i < size; i++) {
+            HTMLTag removed = passedTags.remove();
+            tags.add(removed);
+            passedTags.add(removed);
+         }
+      }
+   }
+   
+   // return list of opening and self closing tags being managed
+   // in the tags Queue
+   public Queue<HTMLTag> getTags() {
+      Queue<HTMLTag> managedTags = new LinkedList<>();
+      int size = tags.size();
+      for (int i = 0; i < size; i++) {
+         HTMLTag tag = tags.remove();
+         if (tag.isOpening() || tag.isSelfClosing())
+            managedTags.add(tag);
+         tags.add(tag);
+      }
+      return managedTags;
    }
    
    public void fixHTML() {
@@ -24,19 +43,22 @@ public class HTMLManager {
       int size = tags.size();
       for (int i = 0; i < size; i++) {
          HTMLTag tag = tags.remove();
-         if (tag.isOpening()) {
+         // if tag is opening or self closing add to stack and readd to tags
+         if (tag.isOpening()) { 
             tags.add(tag);
             stack.push(tag);
          } else if (tag.isSelfClosing())
             tags.add(tag);
          else
-            if (!stack.isEmpty())
+            // otherwise if tag is closing and matches the top of stack then add
+            // closing tag to tags Queue
+            if (!stack.isEmpty()) // make sure not to peek into an empty stack
                if (tag.matches(stack.peek())) {
                   tags.add(tag);
                   stack.pop();
                }
       }
-      while (!stack.isEmpty())
+      while (!stack.isEmpty()) // add opposite of remaining tags in stack to tags Queue
          tags.add(stack.pop().getMatching());
    }
    
@@ -99,4 +121,4 @@ public class HTMLManager {
  ===============================
  
   ----jGRASP: operation complete.
-/*  
+*/  
